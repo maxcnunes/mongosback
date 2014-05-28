@@ -64,12 +64,18 @@ function do_archive {
 
   if [ $DAYS_TO_KEEP -gt "1" ] ; then
     log "performing archiving functions..."
-    TO_DELETE=`find $BACKUP_PATH -name "*dump.tar*" -type f -mtime +$DAYS_TO_KEEP`
-      if [ ! -z "$TO_DELETE" ] ; then
-        log "deleting files older than $DAYS_TO_KEEP days:"
-        find $BACKUP_PATH -name "*dump.tar*" -type f -mtime +$DAYS_TO_KEEP -exec du -hs {} \; >> $LOG_FILE
-        find $BACKUP_PATH -name "*dump.tar*" -type f -mtime +$DAYS_TO_KEEP -exec rm {} \;
-      fi
+
+    if [ $ARCHIVE_TYPE == "DATE_MODIFIED" ]; then
+      TO_DELETE=`find $BACKUP_PATH -name "*dump.tar*" -type f -mtime +$DAYS_TO_KEEP`
+        if [ ! -z "$TO_DELETE" ] ; then
+          log "deleting files older than $DAYS_TO_KEEP days (based on modified date):"
+          find $BACKUP_PATH -name "*dump.tar*" -type f -mtime +$DAYS_TO_KEEP -exec du -hs {} \; >> $LOG_FILE
+          find $BACKUP_PATH -name "*dump.tar*" -type f -mtime +$DAYS_TO_KEEP -exec rm {} \;
+        fi
+    else
+      log "deleting files older than $DAYS_TO_KEEP days (based on filename):"
+      ls -rv $BACKUP_PATH | awk "NR>$DAYS_TO_KEEP" | xargs rm -f
+    fi
   else
     find $BACKUP_PATH -name "dump.tar" -exec rm {} \;
   fi
