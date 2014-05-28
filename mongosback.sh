@@ -121,7 +121,7 @@ function prepare_job {
   if [ -z "$DO_BACKUP" ] ; then 
     DO_BACKUP="full" 
   fi
-  COMPRESSED_NAME="$(echo $DO_BACKUP)_$(date +%m_%d_%Y_%H-%M-%S)_dump.tar"
+  COMPRESSED_NAME="$(echo $DO_BACKUP)_$(date $FORMAT_DATE)_dump.tar"
 }
 
 function rawd_backup {
